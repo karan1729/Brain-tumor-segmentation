@@ -87,4 +87,22 @@ brain_out = img.copy()
 #In a copy of the original image, clear those pixels that don't correspond to the brain
 brain_out[closing==False] = (0,0,0)
 
+marker_area = [np.sum(markers==m) for m in range(np.max(markers)) if m!=0] 
+#Get label of largest component by area
+largest_component = np.argmax(marker_area)+1 #Add 1 since we dropped zero above                        
+#Get pixels which correspond to the brain
+brain_mask = markers==largest_component
 
+brain_out = img.copy()
+#In a copy of the original image, clear those pixels that don't correspond to the brain
+brain_out[brain_mask==False] = (0,0,0)
+
+img = cv2.imread('brains1.png')
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    
+# noise removal
+kernel = np.ones((3,3),np.uint8)
+opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+    
